@@ -1,10 +1,12 @@
 import asyncio
+import importlib
 import logging
 import os
 import sys
 from argparse import ArgumentParser
 
 __all__ = ['main']
+from typing import Tuple, Optional
 
 from shepherd.runner import BaseRunner
 
@@ -33,7 +35,11 @@ def main() -> None:
 
     args = create_argparser().parse_args()
 
-    runner = BaseRunner(args.config_path, args.port, args.stream)
+    module_name = "model.isletnet_runner"
+    class_name = "IsletnetRunner"
+
+    _module = importlib.import_module(module_name)
+    runner = getattr(_module, class_name)(args.config_path, args.port, args.stream)
 
     # listen for input messages
     asyncio.run(runner.process_all())

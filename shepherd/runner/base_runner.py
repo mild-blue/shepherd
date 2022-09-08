@@ -43,8 +43,6 @@ class BaseRunner:
         """Create new :py:class:`Runner`."""
         logging.info('Creating runner from `%s` listening on port %s', config_path, port)
 
-        self._logger = logging
-
         # bind to the socket
         self._port = port
         self._socket = None
