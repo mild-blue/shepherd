@@ -1,17 +1,13 @@
-import re
-import os
 import logging
-import traceback
+import os
 import os.path as path
+import re
+import traceback
 from abc import abstractmethod
-from typing import Optional, Any, Dict
 
 import zmq
 import zmq.asyncio
 
-import emloop as el
-from emloop.cli.util import validate_config, find_config
-from emloop.utils import load_config
 from shepherd.comm import *
 from shepherd.constants import INPUT_DIR, OUTPUT_DIR
 
@@ -45,7 +41,9 @@ class BaseRunner:
 
     def __init__(self, config_path: str, port: int, stream_name: str):
         """Create new :py:class:`Runner`."""
-        logging.info('Creating emloop runner from `%s` listening on port %s', config_path, port)
+        logging.info('Creating runner from `%s` listening on port %s', config_path, port)
+
+        self._logger = logging
 
         # bind to the socket
         self._port = port
@@ -53,51 +51,6 @@ class BaseRunner:
 
         self._config_path: str = config_path
         self._stream_name: str = stream_name
-        self._config: Dict[str, Any] = None
-        self._dataset: Optional[el.AbstractDataset] = None
-        self._model: Optional[el.AbstractModel] = None
-
-    def _load_config(self) -> None:
-        """
-        Maybe load the **emloop** configuration from previously specified file and apply updates
-        from ``eval.<stream_name>`` section.
-        """
-        if self._config is None:
-            logging.debug('Loading config from `%s', self._config_path)
-            # load config
-            self._config = load_config(config_file=find_config(self._config_path))
-            if 'eval' in self._config and self._stream_name in self._config['eval']:
-                logging.debug('Applying eval config updates for stream `%s`', self._stream_name)
-                update_section = self._config['eval'][self._stream_name]
-                for subsection in ['dataset', 'model', 'main_loop']:
-                    if subsection in update_section:
-                        self._config[subsection].update(update_section[subsection])
-                if 'hooks' in update_section:
-                    self._config['hooks'] = update_section['hooks']
-                else:
-                    logging.warning('Config does not contain `eval.%s.hooks` section. '
-                                    'No hook will be employed during the evaluation.', self._stream_name)
-                    self._config['hooks'] = []
-            self._config["model"]["n_gpus"] = n_available_gpus()
-            validate_config(self._config)
-            logging.debug('Loaded config: %s', self._config)
-
-    def _load_dataset(self) -> None:
-        """Maybe load dataset."""
-        if self._dataset is None:
-            self._load_config()
-            logging.info('Creating dataset')
-            self._dataset = el.create_dataset(self._config, None)
-
-    def _load_model(self) -> None:
-        """Maybe load model."""
-        if self._model is None:
-            self._load_config()
-            logging.info('Creating model')
-            restore_from = self._config_path
-            if not path.isdir(restore_from):
-                restore_from = path.dirname(restore_from)
-            self._model = el.create_model(self._config, None, self._dataset, restore_from)
 
     @abstractmethod
     def _process_job(self, input_path: str, output_path: str) -> None:

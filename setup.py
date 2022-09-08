@@ -42,7 +42,6 @@ setup(name='shepherd',
         'schematics==2.1.1',
         'aiohttp==3.7.4',
         'aiohttp-cors==0.7.0',
-        'emloop>=0.2',
         'apistrap==0.9.11',
         'minio==5.0.6',
         'urllib3==1.24.2'

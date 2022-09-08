@@ -1,7 +1,6 @@
 import logging
 
 import click
-import emloop as el
 
 from aiohttp import web
 import aiohttp_cors
@@ -32,8 +31,7 @@ def run(host, port, config_file) -> None:
 
     # set-up logging
     logging.basicConfig(level=config.logging.log_level,
-                        format=el.constants.EL_LOG_FORMAT,
-                        datefmt=el.constants.EL_LOG_DATE_FORMAT)
+                        format="%(asctime)s-%(levelname)s-%(name)s::%(module)s|%(lineno)s:: %(message)s")
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     welcome()
 
