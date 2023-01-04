@@ -20,21 +20,6 @@ def test_extract_gpu_number():
     assert extract_gpu_number('/dev/nvidia3') == '3'
 
 
-def test_bare_sheep_start_stop(bare_sheep: BareSheep):
-    bare_sheep.slaughter()
-    bare_sheep.start('emloop-test', 'latest')
-    assert bare_sheep.running
-    bare_sheep.slaughter()
-    assert not bare_sheep.running
-    bare_sheep.start('emloop-test', 'latest')
-
-
-def test_bare_configuration_error(bare_sheep: BareSheep):
-
-    with pytest.raises(SheepConfigurationError):  # model version does not exist
-        bare_sheep.start('emloop-test', 'i-do-not-exist')
-
-
 @pytest.fixture()
 def image_valid2() -> Tuple[str, str]:
     yield 'library/alpine', 'edge'

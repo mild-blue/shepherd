@@ -1,11 +1,11 @@
 import logging
-import re
 import os
-import ruamel.yaml
+import re
 from typing import Optional, Dict, Any
 
+import ruamel.yaml
 from schematics import Model
-from schematics.types import ModelType, DictType, StringType, URLType, BaseType
+from schematics.types import ModelType, DictType, StringType, BaseType
 
 
 def strip_url_scheme(url):

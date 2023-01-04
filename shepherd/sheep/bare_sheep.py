@@ -1,10 +1,8 @@
 import os
 import shlex
 import subprocess
-import os.path as path
 from typing import Dict, Any, Optional
 
-import emloop as el
 from schematics.types import StringType
 
 from .base_sheep import BaseSheep
@@ -35,22 +33,6 @@ class BareSheep(BaseSheep):
         self._config: self.Config = self.Config(config)
         self._runner: Optional[subprocess.Popen] = None
         self._runner_config_path: Optional[str] = None
-
-    def _load_model(self, model_name: str, model_version: str) -> None:
-        """
-        Set up runner config path to ``working_directory`` / ``model_name`` / ``model_version`` / ``config.yaml``.
-
-        :param model_name: model name
-        :param model_version: model version
-        :raise SheepConfigurationError: if the runner config path does not exist
-        """
-        emloop_config_path = path.join(self._config.working_directory, model_name, model_version,
-                                       el.constants.EL_CONFIG_FILE)
-        if not path.exists(emloop_config_path):
-            raise SheepConfigurationError('Cannot load model `{}:{}`, file `{}` does not exist.'
-                                          .format(model_name, model_version, emloop_config_path))
-        super()._load_model(model_name, model_version)
-        self._runner_config_path = path.relpath(emloop_config_path, self._config.working_directory)
 
     def start(self, model_name: str, model_version: str) -> None:
         """
